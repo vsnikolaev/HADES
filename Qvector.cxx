@@ -2,9 +2,6 @@
 #include <math.h>
 #include <vector>
 
-TProfile2D* prof_psdx_psdy = new TProfile2D("psdxy", " psd modules", 100 -500, 500, 100, -500, 0, 20);
-	//prof_psdx_psdy->GetXaxis()->SetTitle("x");
-	//prof_psdx_psdy->GetXaxis()->SetTitle("y");
 
 Qvector::Qvector() {
 	clear();
@@ -30,7 +27,7 @@ void Qvector::Recenter(Float_t _corx, Float_t _cory) {
 	Qy -= _cory;
 }
 
-void Qvector::findQ(DataTreeEvent* _ev) {
+void Qvector::FindQ(DataTreeEvent* _ev) {
 	Int_t N_psd_modules = _ev->GetNPSDModules();
 	DataTreePSDModule* m_psd;
 	Float_t m_phi, m_charge;
@@ -69,14 +66,12 @@ void Qvector::Resolution(DataTreeEvent* _ev) {
 			continue;
 		my_psd_mod.push_back(m_psd);
 	}
-
 	//2 rand subevents;
 	N_psd_modules = my_psd_mod.size();
 	for (int j = 0; j<N_psd_modules; j++) {
 		if (rand() % 2) random_subevent1.push_back(my_psd_mod[j]);
 		else random_subevent2.push_back(my_psd_mod[j]);
 	}
-		
 	while (random_subevent1.size() != my_psd_mod.size() / 2 && random_subevent2.size() != my_psd_mod.size() / 2) {
 		Int_t a;
 		if (random_subevent1.size() > random_subevent2.size()) {
@@ -90,12 +85,11 @@ void Qvector::Resolution(DataTreeEvent* _ev) {
 			random_subevent2.erase(random_subevent2.begin() + a);
 		}
 	}
-	
 	//we have 2 random subevents.
 	N_psd_modules = random_subevent1.size();
 	for (int i=0; i < N_psd_modules; i++){
 		m_charge = random_subevent1[i]->GetEnergy();
-		m_phi = random_subevent1[i]->GetPhi();;
+		m_phi = random_subevent1[i]->GetPhi();
 		Qxrecent[0] += m_charge * cos(m_phi);
 		Qyrecent[0] += m_charge * sin(m_phi);
 		Q[0] += m_charge;
@@ -120,10 +114,10 @@ void Qvector::Resolution(DataTreeEvent* _ev) {
 
 
 void Qvector::RecenterRes(Float_t _corx, Float_t _cory){
-	Qxrecent[0]-=_corx;
-	Qxrecent[1]-=_corx;
-	Qyrecent[0]-=_cory;
-	Qyrecent[1]-=_cory;
+	Qxrecent[0] -= _corx;
+	Qxrecent[1] -= _corx;
+	Qyrecent[0] -= _cory;
+	Qyrecent[1] -= _cory;
 }
 
 Float_t Qvector::GetResolution(){

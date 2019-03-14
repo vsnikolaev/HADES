@@ -2,7 +2,7 @@
 
 //-1 not identified| 2 e+ | 3 e- | 8 pi+ | 9 pi- | 11 k+ | 14 p | 45 d | 46 t | 47 alfa | 49 He3
 void nTriggers::SetParticle(Int_t p){
-	particle=p;
+	particle = p;
 }
 
 Int_t nTriggers::GetParticle(){
@@ -85,7 +85,6 @@ bool only_off_trigger(DataTreeEvent* _ev, Int_t a){
 	if (a==100) return !Correct_event(_ev);
 	DataTreeEvent* ev = _ev;
 	Float_t Rx = ev->GetVertexPositionComponent(0), Ry = ev->GetVertexPositionComponent(1);
-
 	switch (a){
 	case 1: 
 		if (ev->GetVertexPositionComponent(2) > 0 || ev->GetVertexPositionComponent(2) < -60)

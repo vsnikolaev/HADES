@@ -22,7 +22,7 @@ public:
 	Float_t GetComponent(int i);
 	void clear();
 	void Recenter(Float_t _corx, Float_t _cory);
-	void findQ(DataTreeEvent* _ev);
+	void FindQ(DataTreeEvent* _ev);
 	Float_t GetEventPlaneAngle();
 	void Resolution(DataTreeEvent* _ev);
 	void RecenterRes(Float_t _corx, Float_t _cory);
