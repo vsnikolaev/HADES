@@ -17,6 +17,7 @@
 	TProfile* resolu = new TProfile("Resolution vs Centrality","centrality R_{1}"  ,10,0,50);
 	TProfile* v2obse = new TProfile("v2 observable vs Centrality","centrality mean v2 obs",10,0,50);
 	TProfile* v2real = new TProfile("real v2 vs Centrality"   ,"centrality mean v2 real",10,0,50);
+	TProfile* realre = new TProfile("real resolution", "centrality mean resolution",10,0,50);
 
 	Long64_t N_events = (Long64_t)t->GetEntries();
 	Int_t n_tracks = 0;
@@ -32,6 +33,8 @@
 	Float_t Qxcor;
 	Float_t Qycor;
 	Float_t res;
+	nTriggers particle;
+	particle.SetParticle(-2);	//-2 off
 
 	DataTreeTrack* tr;
 	DataTreeTOFHit* tof_hit;
@@ -77,6 +80,9 @@
 				continue;
 			}
 			tr = ev->GetVertexTrack(j);
+			if (!particle.DeterminedParticle(tr)){
+				continue;
+			}
 			phi = tr->GetPhi();
 			vn = cos(2 * (phi - PsiEP) );
 			v2obse->Fill(centrality, vn);
@@ -84,11 +90,14 @@
   }
 
   //use resolution to find real v2;
-
+	for (int i=0; i<10; i++){
+		res = resolu->GetBinContent(i + 1);
+		realre->Fill(i*5+3, sqrt(2*res));
+	}
 	for (int i=0; i<10; i++){
 		vn = v2obse->GetBinContent(i + 1);
-		res= resolu->GetBinContent(i + 1);
-		v2real->Fill( i*5 + 3, vn/sqrt(res));
+		res= realre->GetBinContent(i + 1);
+		v2real->Fill( i*5 + 3, vn/res);
 	}
 
 	//save
@@ -97,6 +106,7 @@
 	meanQx->Write();
 	meanQy->Write();
 	resolu->Write();
+	realre->Write();
 	v2obse->Write();
 	v2real->Write();
 }

@@ -1,5 +1,23 @@
 #include "triggers.h"
 
+//-1 not identified| 2 e+ | 3 e- | 8 pi+ | 9 pi- | 11 k+ | 14 p | 45 d | 46 t | 47 alfa | 49 He3
+void nTriggers::SetParticle(Int_t p){
+	particle=p;
+}
+
+Int_t nTriggers::GetParticle(){
+	return particle;
+}
+
+//if (particle.GetParticle())==-2) return true;
+bool nTriggers::DeterminedParticle(DataTreeTrack* tr){
+	if (particle == -2) return true;
+	if (tr->GetPdgId() == particle){
+		return true;
+	}
+    return false;
+}
+
 //to off triggers input false
 bool Correct_event(DataTreeEvent* _ev, bool work) {
 	if (!work) return 1;
@@ -147,3 +165,4 @@ bool only_off_track(DataTreeEvent* _ev, Int_t idx, Int_t a){
 	}
 	return 0;
 }
+

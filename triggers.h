@@ -9,6 +9,16 @@
 const float pi = 3.1415;
 const float _c = 299.792458;
 
+class nTriggers{
+private:
+    Int_t particle;
+public:
+    nTriggers(){particle = -2;};
+    ~nTriggers(){};
+    void SetParticle(Int_t p);
+    Int_t GetParticle();
+    bool DeterminedParticle(DataTreeTrack* tr);
+}
 void triggers(){};
 bool Correct_event(DataTreeEvent* _ev, bool work = true);
 bool Correct_track(DataTreeEvent* _ev, Int_t idx, bool work = true);
