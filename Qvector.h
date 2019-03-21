@@ -14,8 +14,8 @@ class Qvector {
 private:
 	Float_t Qx;
 	Float_t Qy;
-	Float_t Qxrecent[2];
-	Float_t Qyrecent[2];
+	Float_t Qxsubev[2];
+	Float_t Qysubev[2];
 public:
 	Qvector();
 	~Qvector() {};
@@ -27,6 +27,9 @@ public:
 	void Resolution(DataTreeEvent* _ev);
 	void RecenterRes(Float_t _corx, Float_t _cory);
 	Float_t GetResolution();
+	Float_t Getsin(Int_t a = 1);
+	Float_t GetSubFlow(Int_t a = 1);
+	Float_t GetSubEPAngle(Int_t a);
 };
 
 #endif // MYQVEC
