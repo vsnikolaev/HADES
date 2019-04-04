@@ -3,6 +3,35 @@
 #include <vector>
 
 
+
+Float_t Subevent::Get_Psy(int a) {
+	if (a > -1 && a < 3)
+		return atan2(Qy[a], Qx[a]);
+	return 0;
+}
+
+Float_t Subevent::Get_res(int a) {
+	switch (a) {
+	case 0: 
+		return sqrt((cos(2 * (Get_Psy(0) - Get_Psy(1))) * cos(2 * (Get_Psy(0) - Get_Psy(2)))) / cos(2 * (Get_Psy(1) - Get_Psy(2))));
+	case 1:
+		return sqrt((cos(2 * (Get_Psy(1) - Get_Psy(2))) * cos(2 * (Get_Psy(1) - Get_Psy(0)))) / cos(2 * (Get_Psy(2) - Get_Psy(0))));
+	case 2:
+		return sqrt((cos(2 * (Get_Psy(2) - Get_Psy(0))) * cos(2 * (Get_Psy(2) - Get_Psy(1)))) / cos(2 * (Get_Psy(0) - Get_Psy(1))));
+	default:
+		return 0;
+	}
+}
+
+
+void Subevent::Resent(Subevent a) {
+	for (int i = 0; i < 3; i++) {
+		this->Qx[i] = this->Qx[i] - a.Qx[i];
+		this->Qy[i] = this->Qy[i] - a.Qy[i];
+	}
+}
+
+
 Qvector::Qvector() {
 	clear();
 }
@@ -140,3 +169,94 @@ Float_t Qvector::GetSubEPAngle(Int_t a) {
 }
 
 
+void Qvector::Fillsub3(DataTreeEvent* _ev) {
+	Int_t N_psd_modules = _ev->GetNPSDModules();
+	DataTreePSDModule* m_psd;
+	Int_t x, y;
+	Int_t idx;
+	Subevent cur;
+	Float_t m_phi, m_charge;
+	Float_t Q[3] = { 0,0,0 };
+	for (int i = 0; i < N_psd_modules; i++) {
+		m_psd = _ev->GetPSDModule(i);
+		if (m_psd->GetId()<0)
+			continue;
+		m_phi = m_psd->GetPhi();
+		m_charge = m_psd->GetEnergy();
+		x = m_psd->GetPositionComponent(0);
+		y = m_psd->GetPositionComponent(1);
+		if (abs(x) < 70 && abs(y) < 70) {
+			idx = 0;
+		}
+		else if (abs(x) < 150 && abs(y) < 150) {
+			idx = 1;
+		}
+		else
+			idx = 2;
+		cur.Qx[idx] += m_charge*cos(m_phi);
+		cur.Qy[idx] += m_charge*sin(m_phi);
+		Q[idx] += m_charge;
+	}
+	for (int j = 0; j < 3; j++) {
+		if (Q[j] != 0) {
+			cur.Qx[j] = cur.Qx[j] / Q[j];
+			cur.Qy[j] = cur.Qy[j] / Q[j];
+		}
+	}
+	sub3 = cur;
+}
+
+Float_t Qvector::Get_cos(int a) {
+	//if (Get_Psy(0) == 0 || Get_Psy(1) == 0 || Get_Psy(2) == 0) return -9;
+	switch (a)
+	{
+	case 0: return cos(2 * (Get_Psy(0) - Get_Psy(1)));
+		break;
+	case 1: return cos(2 * (Get_Psy(0) - Get_Psy(2)));
+		break;
+	case 2: return cos(2 * (Get_Psy(1) - Get_Psy(2)));
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+Subevent Qvector::Getsub3() {
+	return sub3;
+}
+
+Float_t Qvector::Get_Psy(int a) {
+	return this->sub3.Get_Psy(a);
+}
+
+Float_t Qvector::Get_res(int a) {
+	return this->sub3.Get_res(a);
+}
+
+
+
+Float_t Qvector::Get_subx(int a) {
+	return this->sub3.Qx[a-1];
+}
+
+
+void Qvector::Resentsub3(Subevent a) {
+	this->sub3.Resent(a);
+}
+
+
+
+
+//Solo
+
+Float_t Get_resolution(Float_t a, Float_t b, Float_t c, Int_t subnumber) {
+	switch (subnumber)
+	{
+	case 0: return sqrt((a * b) / c);
+	case 1: return sqrt((c * a) / b);
+	case 2: return sqrt((b * c) / a);
+	default:
+		return 0;
+	}
+}
