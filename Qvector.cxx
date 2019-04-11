@@ -2,15 +2,21 @@
 #include <math.h>
 #include <vector>
 
+Subevent3::Subevent3() {
+	clear();
+}
 
+void Subevent3::clear() {
+	Qx[0] = Qx[1] = Qx[2] = Qy[0] = Qy[1] = Qy[2] = 0;
+}
 
-Float_t Subevent::Get_Psy(int a) {
+Float_t Subevent3::Get_Psy(int a) {
 	if (a > -1 && a < 3)
 		return atan2(Qy[a], Qx[a]);
 	return 0;
 }
 
-Float_t Subevent::Get_res(int a) {
+Float_t Subevent3::Get_Res(int a) {
 	switch (a) {
 	case 0: 
 		return sqrt((cos(2 * (Get_Psy(0) - Get_Psy(1))) * cos(2 * (Get_Psy(0) - Get_Psy(2)))) / cos(2 * (Get_Psy(1) - Get_Psy(2))));
@@ -23,13 +29,20 @@ Float_t Subevent::Get_res(int a) {
 	}
 }
 
-
-void Subevent::Resent(Subevent a) {
+void Subevent3::Resent(Subevent3 a) {
 	for (int i = 0; i < 3; i++) {
 		this->Qx[i] = this->Qx[i] - a.Qx[i];
 		this->Qy[i] = this->Qy[i] - a.Qy[i];
 	}
 }
+
+
+bool Subevent3::GoodSubEvents() {
+	if (this->Qx[0] == 999 || this->Qy[0] == 999)
+		return false;
+	return true;
+}
+
 
 
 Qvector::Qvector() {
@@ -50,7 +63,9 @@ void Qvector::clear() {
 		Qxsubev[i] = 0;
 		Qysubev[i] = 0;
 	}
+	sub3.clear();
 }
+
 void Qvector::Recenter(Float_t _corx, Float_t _cory) {
 	Qx -= _corx;
 	Qy -= _cory;
@@ -71,17 +86,20 @@ void Qvector::FindQ(DataTreeEvent* _ev) {
 		Qy += m_charge*sin(m_phi);
 		Q += m_charge;
 	}
-	Qx = Qx / Q;
-	Qy = Qy / Q;
+	if (Q > 0) {
+		Qx = Qx / Q;
+		Qy = Qy / Q;
+	}
 }
 
 Float_t Qvector::GetEventPlaneAngle() {
 	return atan2(Qy, Qx);
 }
 
-
-void Qvector::Resolution(DataTreeEvent* _ev) {	
+//true if correct, false if error occured
+bool Qvector::Resolution(DataTreeEvent* _ev) {
 	Int_t N_psd_modules = _ev->GetNPSDModules();
+	if (N_psd_modules == 1) return false;
 	DataTreePSDModule* m_psd;
 	std::vector<DataTreePSDModule*> my_psd_mod;
 	std::vector<DataTreePSDModule*> random_subevent1;
@@ -91,13 +109,13 @@ void Qvector::Resolution(DataTreeEvent* _ev) {
 	Float_t PsiEP[2];
 	for (int i = 0; i < N_psd_modules; i++) {
 		m_psd = _ev->GetPSDModule(i);
-		if (m_psd->GetId()<0)
+		if (m_psd->GetId() < 0)
 			continue;
 		my_psd_mod.push_back(m_psd);
 	}
 	//2 rand subevents;
 	N_psd_modules = my_psd_mod.size();
-	for (int j = 0; j<N_psd_modules; j++) {
+	for (int j = 0; j < N_psd_modules; j++) {
 		if (rand() % 2) random_subevent1.push_back(my_psd_mod[j]);
 		else random_subevent2.push_back(my_psd_mod[j]);
 	}
@@ -115,38 +133,39 @@ void Qvector::Resolution(DataTreeEvent* _ev) {
 		}
 	}
 	//we have 2 random subevents.
-	N_psd_modules = random_subevent1.size();
-	for (int i=0; i < N_psd_modules; i++){
-		m_charge = random_subevent1[i]->GetEnergy();
-		m_phi = random_subevent1[i]->GetPhi();
+	for (std::vector<DataTreePSDModule*>::iterator it = random_subevent1.begin(); it != random_subevent1.end(); it++) {
+		DataTreePSDModule* curmod = *it;
+		m_charge = curmod->GetEnergy();
+		m_phi = curmod->GetPhi();
 		Qxsubev[0] += m_charge * cos(m_phi);
 		Qysubev[0] += m_charge * sin(m_phi);
 		Q[0] += m_charge;
-	}	
-	N_psd_modules = random_subevent2.size();
-	for (int i=0; i < N_psd_modules; i++){
-		m_charge = random_subevent2[i]->GetEnergy();
-		m_phi = random_subevent2[i]->GetPhi();
+	}
+	for (std::vector<DataTreePSDModule*>::iterator it = random_subevent2.begin(); it != random_subevent2.end(); it++) {
+		DataTreePSDModule* curmod = *it;
+		m_charge = curmod->GetEnergy();
+		m_phi = curmod->GetPhi();
 		Qxsubev[1] += m_charge * cos(m_phi);
 		Qysubev[1] += m_charge * sin(m_phi);
 		Q[1] += m_charge;
 	}
-	if (Q[0]!=0) { 
-		Qxsubev[0] = Qxsubev[0] / Q[0];
-		Qysubev[0] = Qysubev[0] / Q[0];
+	if (Q[0] == 0 || Q[1] == 0) {
+		Qxsubev[0] = Qysubev[0] = Qxsubev[1] = Qysubev[1] = 0;
+		return false;
 	}
-	if (Q[1]!=0){
-		Qxsubev[1] = Qxsubev[1] / Q[1];
-		Qysubev[1] = Qysubev[1] / Q[1];
-	}
+	Qxsubev[0] = Qxsubev[0] / Q[0];
+	Qysubev[0] = Qysubev[0] / Q[0];
+	Qxsubev[1] = Qxsubev[1] / Q[1];
+	Qysubev[1] = Qysubev[1] / Q[1];
+	return true;
 }
 
 
-void Qvector::RecenterRes(Float_t _corx, Float_t _cory){
-	Qxsubev[0] -= _corx;
-	Qxsubev[1] -= _corx;
-	Qysubev[0] -= _cory;
-	Qysubev[1] -= _cory;
+void Qvector::RecenterRes(Float_t _corx1, Float_t _cory1, Float_t _corx2, Float_t _cory2){
+	Qxsubev[0] -= _corx1;
+	Qxsubev[1] -= _corx2;
+	Qysubev[0] -= _cory1;
+	Qysubev[1] -= _cory2;
 }
 
 Float_t Qvector::GetResolution(){
@@ -174,7 +193,7 @@ void Qvector::Fillsub3(DataTreeEvent* _ev) {
 	DataTreePSDModule* m_psd;
 	Int_t x, y;
 	Int_t idx;
-	Subevent cur;
+	Subevent3 cur;
 	Float_t m_phi, m_charge;
 	Float_t Q[3] = { 0,0,0 };
 	for (int i = 0; i < N_psd_modules; i++) {
@@ -185,10 +204,10 @@ void Qvector::Fillsub3(DataTreeEvent* _ev) {
 		m_charge = m_psd->GetEnergy();
 		x = m_psd->GetPositionComponent(0);
 		y = m_psd->GetPositionComponent(1);
-		if (abs(x) < 70 && abs(y) < 70) {
+		if (abs(x) < 240 && abs(y) < 240) {			//70
 			idx = 0;
 		}
-		else if (abs(x) < 150 && abs(y) < 150) {
+		else if (abs(x) < 400 && abs(y) < 400) {	//150
 			idx = 1;
 		}
 		else
@@ -202,19 +221,25 @@ void Qvector::Fillsub3(DataTreeEvent* _ev) {
 			cur.Qx[j] = cur.Qx[j] / Q[j];
 			cur.Qy[j] = cur.Qy[j] / Q[j];
 		}
+		else {
+			cur.clear();
+			cur.Qx[0] = 999;
+			cur.Qy[0] = 999;
+			break;
+		}
 	}
 	sub3 = cur;
 }
 
-Float_t Qvector::Get_cos(int a) {
-	//if (Get_Psy(0) == 0 || Get_Psy(1) == 0 || Get_Psy(2) == 0) return -9;
+Float_t Qvector::Get_cos3(int a) {
+	//if (Get_Psy3(0) == 0 || Get_Psy3(1) == 0 || Get_Psy3(2) == 0) return -9;
 	switch (a)
 	{
-	case 0: return cos(2 * (Get_Psy(0) - Get_Psy(1)));
+	case 0: return cos(2 * (Get_Psy3(0) - Get_Psy3(1)));
 		break;
-	case 1: return cos(2 * (Get_Psy(0) - Get_Psy(2)));
+	case 1: return cos(2 * (Get_Psy3(0) - Get_Psy3(2)));
 		break;
-	case 2: return cos(2 * (Get_Psy(1) - Get_Psy(2)));
+	case 2: return cos(2 * (Get_Psy3(1) - Get_Psy3(2)));
 		break;
 	default:
 		break;
@@ -222,30 +247,21 @@ Float_t Qvector::Get_cos(int a) {
 	return 0;
 }
 
-Subevent Qvector::Getsub3() {
+Subevent3 Qvector::Getsub3() {
 	return sub3;
 }
 
-Float_t Qvector::Get_Psy(int a) {
+Float_t Qvector::Get_Psy3(int a) {
 	return this->sub3.Get_Psy(a);
 }
 
-Float_t Qvector::Get_res(int a) {
-	return this->sub3.Get_res(a);
+Float_t Qvector::Get_Res3(int a) {
+	return this->sub3.Get_Res(a);
 }
 
-
-
-Float_t Qvector::Get_subx(int a) {
-	return this->sub3.Qx[a-1];
-}
-
-
-void Qvector::Resentsub3(Subevent a) {
+void Qvector::Resentsub3(Subevent3 a) {
 	this->sub3.Resent(a);
 }
-
-
 
 
 //Solo

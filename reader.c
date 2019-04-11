@@ -17,7 +17,6 @@ void reader() {
 	TProfile* v2obse = new TProfile("v2 observable vs Centrality", "centrality mean v2 obs", 10, 0, 50);
 	TProfile* v2real = new TProfile("real v2 vs Centrality", "centrality mean v2 real", 10, 0, 50);
 	TProfile* realre = new TProfile("real resolution vs centrality", "centrality mean resolution", 10, 0, 50);
-
 	//TProfile* meansina = new TProfile("<sin(#Psi_{a}-#Psi_{b})> vs Centrality", "centrality <sin(#Psi_{a}-#Psi_{b})>", 10, 0, 50);
 	//TProfile* meansinb = new TProfile("<sin(#Psi_{b}-#Psi_{a})> vs Centrality", "centrality <sin(#Psi_{b}-#Psi_{a})>", 10, 0, 50);
 	
@@ -104,11 +103,12 @@ void reader() {
 			continue;
 		}
 		Qvector curQ;
-		Subevent cursub3;
-		centrality = ev->GetCentrality();
+		Subevent3 cursub3;
+		centrality = ev->GetCentrality(0);
 		curQ.Fillsub3(ev);
 		cursub3=curQ.Getsub3();
 		for (int j = 0; j < 3; j++) {
+			if (cursub3.Qx[j] == 0 || cursub3.Qy[j] == 0) continue;
 			Qx3sub->Fill(centrality / 5 + 1, j + 0.5, cursub3.Qx[j], 1);
 			Qy3sub->Fill(centrality / 5 + 1, j + 0.5, cursub3.Qy[j], 1);
 		}
@@ -120,19 +120,18 @@ void reader() {
 			continue;
 		}
 		Qvector curQ;
-		Subevent curmeansub3;
-		centrality = ev->GetCentrality();
+		Subevent3 curmeansub3;
+		centrality = ev->GetCentrality(0);
 		for (int j = 0; j < 3; j++) {
 			curmeansub3.Qx[j] = Qx3sub->GetBinContent(centrality / 5 + 1, j + 1);
 			curmeansub3.Qy[j] = Qy3sub->GetBinContent(centrality / 5 + 1, j + 1);
 		}
-		curQ.Resolution(ev);
+		curQ.Resolution(ev);//now Resolution is bool,  so I must take it state. if() continue;...
 		curQ.Fillsub3(ev);
 		curQ.Resentsub3(curmeansub3);
 		for (int i = 0; i < 3; i++) {
-			res3[i] = curQ.Get_cos(i);
+			res3[i] = curQ.Get_cos3(i);//here it is cos
 		}
-		//if (res3[0] == -9 || res3[1] == -9 || res3[2] == -9) continue;
 		cos10->Fill(centrality, res3[0]);
 		cos20->Fill(centrality, res3[1]);
 		cos12->Fill(centrality, res3[2]);
@@ -179,7 +178,7 @@ void reader() {
 			continue;
 		}
 		Qvector curQ;
-		centrality = ev->GetCentrality();
+		centrality = ev->GetCentrality(0);
 		curQ.FindQ(ev);
 		if (curQ.GetComponent(1) != curQ.GetComponent(1) || curQ.GetComponent(2) != curQ.GetComponent(2))
 			continue;
