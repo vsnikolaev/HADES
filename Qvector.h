@@ -53,7 +53,7 @@ public:
 Float_t Get_res2sub(Float_t a);
 Float_t Get_error_res2sub(Float_t a, Float_t a_er);
 Float_t Get_resolution(Float_t a, Float_t b, Float_t c, Int_t subnumber);
-Float_t Get_error_resolution(Float_t a, Float_t b, Float_t c, Int_t subnumber);
+Float_t Get_error_resolution(Float_t a, Float_t b, Float_t c, Float_t a_er, Float_t b_er, Float_t c_er, Int_t subnumber);
 Float_t Get_bessel_resolution(Float_t a);
 
 #endif // MYQVEC

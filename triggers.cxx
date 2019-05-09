@@ -80,6 +80,39 @@ bool Correct_track(DataTreeEvent* _ev, Int_t idx, bool work) {
 	return true;
 }
 
+//to off input Correct_FWhit(m_psd,false);
+bool Correct_FWhit(DataTreePSDModule* m_psd, bool work) {
+	if (!work) return true;
+	if (m_psd->GetEnergy() < 80)				//Oleg
+		return false;
+	if (m_psd->GetEnergy() > 600)				
+		return false;
+	/*	//Is it works?
+	if (m_psd->GetBeta() > 1.0)
+		return false;
+	Int_t x, y;
+	x = m_psd->GetPositionComponent(0);
+	y = m_psd->GetPositionComponent(1);
+	if (abs(x) < 250 && abs(y) < 250) {			//first 5 rings (0-4) <240
+		if (m_psd->GetBeta() < 0.84)
+			return false;
+	}
+	else if (abs(x) < 410 && abs(y) < 410) {	//next 2 rings (5-6) <400
+		if (m_psd->GetBeta() < 0.84)
+			return false;
+	}
+	else {										//next 3 rings (7-9)
+		if (m_psd->GetBeta() < 0.8)
+			return false;
+	}
+//	Float_t t;
+//	t = m_psd->GetTime();
+//	if (t < 10 || t>120) 
+//		return false;
+	*/
+	return true;
+}
+
 //base all that off
 bool only_off_trigger(DataTreeEvent* _ev, Int_t a) {
 	if (a == 100) return !Correct_event(_ev);
@@ -178,4 +211,19 @@ bool Centrality_good_event(DataTreeEvent* _ev, bool work) {
 	if (!ev->GetTrigger(HADES_constants::kNoPileUpSTART)->GetIsFired())
 		return false;
 	return true;
+}
+
+//I do not remember why it is here
+void read_header_file(std::vector<std::string> &_p) {
+	std::ifstream in("header_file.txt");
+	if (!in) {
+		std::cout << "could not open file." << std::endl;
+		return;
+	}
+	std::string s;
+	while (in) {
+		std::getline(in, s);
+		_p.push_back(s);
+	}
+	in.close();
 }

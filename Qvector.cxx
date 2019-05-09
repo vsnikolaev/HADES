@@ -1,4 +1,5 @@
 ﻿#include "Qvector.h"
+#include "triggers.h"
 #include <math.h>
 #include <vector>
 
@@ -68,6 +69,10 @@ void Qvector::FindQ(DataTreeEvent* _ev) {
 		m_psd = _ev->GetPSDModule(i);
 		if ( m_psd->GetId()<0 )
 			continue;
+//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
+//			continue;
+		if (!(Correct_FWhit(m_psd)))					//Oleg
+			continue;	
 		m_phi = m_psd->GetPhi();
 		m_charge = m_psd->GetEnergy();
 		Qx += m_charge*cos(m_phi);
@@ -77,6 +82,10 @@ void Qvector::FindQ(DataTreeEvent* _ev) {
 	if (Q > 0) {
 		Qx = Qx / Q;
 		Qy = Qy / Q;
+	}
+	if (Q == 0 || (Q != Q)) {
+		Qx = -999;
+		Qy = -999;
 	}
 }
 
@@ -102,6 +111,10 @@ bool Qvector::Resolution(DataTreeEvent* _ev) {
 	for (int i = 0; i < N_psd_modules; i++) {
 		m_psd = _ev->GetPSDModule(i);
 		if (m_psd->GetId() < 0)
+			continue;
+	//	if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
+	//		continue;
+		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;
 		my_psd_mod.push_back(m_psd);
 	}
@@ -186,9 +199,14 @@ bool Qvector::Fillsub3(DataTreeEvent* _ev) {
 	Subevent3 cur;
 	Float_t m_phi, m_charge;
 	Float_t Q[3] = { 0,0,0 };
+	Int_t count[3] = { 0,0,0 };
 	for (int i = 0; i < N_psd_modules; i++) {
 		m_psd = _ev->GetPSDModule(i);
 		if (m_psd->GetId()<0)
+			continue;
+//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
+//			continue;
+		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;
 		m_phi = m_psd->GetPhi();
 		m_charge = m_psd->GetEnergy();
@@ -206,13 +224,18 @@ bool Qvector::Fillsub3(DataTreeEvent* _ev) {
 		cur.Qx[idx] += m_charge*cos(m_phi);
 		cur.Qy[idx] += m_charge*sin(m_phi);
 		Q[idx] += m_charge;
+		count[idx]++;
 	}
 	for (int j = 0; j < 3; j++) {
-		if (Q[j] > 30) {
-			cur.Qx[j] = cur.Qx[j] / Q[j];
-			cur.Qy[j] = cur.Qy[j] / Q[j];
+		if (Q[j] < 80) {
+			return false;
+		}				//empty sub event;
+		if (count[j] < 3) {
+			return false;
 		}
-		else return false;							//empty sub event;
+		cur.Qx[j] = cur.Qx[j] / Q[j];
+		cur.Qy[j] = cur.Qy[j] / Q[j];
+							
 	}
 	this->sub3 = cur;
 	return true;
@@ -287,16 +310,17 @@ Float_t Get_error_resolution(Float_t a, Float_t b, Float_t c, Float_t a_er, Floa
 
 //input <cos(km(psia-psib)>
 Float_t Get_bessel_resolution(Float_t a) {
-	if (a<0.4) return Get_res2sub(a);
+	//if (a<0.4) return Get_res2sub(a);
 	Float_t hi = 0;
 	Float_t resolution;
 	Float_t err = a / 100;
-	for (; hi < 3; hi += 0.001) {
+	for (; hi < 3; hi += 0.0001) {
 		resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
 		//resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
 		if (abs(resolution - a) < err)
 			break;
 	}
+	std::cerr << hi << std::endl;
 	if (hi >= 3) return Get_res2sub(a);
 	hi = hi*sqrt(2);
 	resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
