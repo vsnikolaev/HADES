@@ -38,6 +38,12 @@ void reader_resolution() {
 
 	//temp begin
 	TProfile* resum = new TProfile("2 rand test res", "2 rand test res", 14, 0, 70);
+	TProfile* cos10s = new TProfile("s cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
+	TProfile* cos20s = new TProfile("s cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
+	TProfile* cos12s = new TProfile("s cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
+	TProfile* r3s1sum = new TProfile("r3s1sum", "sub 1 test", 14, 0, 70);
+	TProfile* r3s2sum = new TProfile("r3s2sum", "sub 2 test", 14, 0, 70);
+	TProfile* r3s3sum = new TProfile("r3s3sum", "sub 3 test", 14, 0, 70);
 	//temp end
 
 	TTree* t;
@@ -192,6 +198,9 @@ NextFile:
 	res3s1sum->Add(res3s1);
 	res3s2sum->Add(res3s2);
 	res3s3sum->Add(res3s3);
+	cos10s->Add(cos10);
+	cos20s->Add(cos20);
+	cos12s->Add(cos12);
 	std::cerr << "resolution found" << std::endl;
 	f->Close();
 	delete f;
@@ -237,7 +246,36 @@ SaveFile:
 		res = Get_bessel_resolution(res);
 		if (res != res) continue;
 		resum->Fill(i * 5 + 2, res + sqrt(2)*err);
-		resum->Fill(i * 5 + 2, res - sqrt(2)*err);
+		resum->Fill(i * 5 + 2, res - sqrt(2)*err);	
+		float cos3[3], cos3err[3];							//3sub res
+		cos3[0] = cos10s->GetBinContent(i + 1);
+		cos3[1] = cos20s->GetBinContent(i + 1);
+		cos3[2] = cos12s->GetBinContent(i + 1);
+		cos3err[0] = cos10s->GetBinError(i + 1);
+		cos3err[1] = cos20s->GetBinError(i + 1);
+		cos3err[2] = cos12s->GetBinError(i + 1);
+		for (int j = 0; j < 3; j++) {
+			res = Get_resolution(cos3[0], cos3[1], cos3[2], j);
+			if (res != res) continue;
+			err = Get_error_resolution(cos3[0], cos3[1], cos3[2], cos3err[0], cos3err[1], cos3err[2], j);
+			err = sqrt(2)*err;
+			switch (j)
+			{
+			case 0:
+				r3s1sum->Fill(i * 5 + 2, res + err);
+				r3s1sum->Fill(i * 5 + 2, res - err);
+				break;
+			case 1:
+				r3s2sum->Fill(i * 5 + 2, res + err);
+				r3s2sum->Fill(i * 5 + 2, res - err);
+				break;
+			case 2:
+				r3s3sum->Fill(i * 5 + 2, res + err);
+				r3s3sum->Fill(i * 5 + 2, res - err);
+			default:
+				break;
+			}
+		}
 	}
 	//temp end
 
@@ -249,6 +287,9 @@ SaveFile:
 	res3s2sum->Write();
 	res3s3sum->Write();
 	resum->Write();
+	r3s1sum->Write();
+	r3s2sum->Write();
+	r3s3sum->Write();
 	s->Close();
 	delete s;
 	std::cerr << "save done" << std::endl;

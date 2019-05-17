@@ -1,13 +1,13 @@
-/home/ariorx/111/11.04.19/lite.root
-/home/ariorx/out_1.root
-/home/ariorx/out_2.root
-/home/ariorx/out_3.root
-/home/ariorx/out_4.root
-/home/ariorx/out_5.root
-/home/ariorx/out_6.root
-/home/ariorx/out_7.root
-/home/ariorx/out_8.root
-/home/ariorx/out_9.root
+/u/vnikolae/out_0.root
+/u/vnikolae/out_1.root
+/u/vnikolae/out_2.root
+/u/vnikolae/out_3.root
+/u/vnikolae/out_4.root
+/u/vnikolae/out_5.root
+/u/vnikolae/out_6.root
+/u/vnikolae/out_7.root
+/u/vnikolae/out_8.root
+/u/vnikolae/out_9.root
 
 st
 
