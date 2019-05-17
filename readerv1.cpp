@@ -2,7 +2,7 @@
 #include "triggers.h"
 //pt сделать из 10 бинов 40
 void readerv1() {
-	auto f = new TFile("out_1.root");
+	auto f = new TFile("out.root");
 	auto t = (TTree*)f->Get("DataTree");
 	auto ev = new DataTreeEvent;
 	auto DTEvent = (TBranch*)t->GetBranch("DTEvent");
@@ -11,7 +11,7 @@ void readerv1() {
 	//including histograms.
 	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);
 	TProfile* meanQy = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);
-	TProfile* resolu = new TProfile("Resolution vs Centrality", "centrality R_{2}", 14, 0, 70);	//mean cos()
+	TProfile* resolu = new TProfile("Resolution vs Centrality", "centrality cos", 14, 0, 70);	//mean cos()
 	TProfile* sqrtre = new TProfile("mean sqrt(cos) vs centrality", "centrality mean sqrt(cos)", 14, 0, 70);
 	TProfile* realre = new TProfile("real resolution vs centrality", "centrality mean resolution", 14, 0, 70);
 	TProfile* v2obse = new TProfile("v2 observable vs Centrality", "centrality mean v2 obs", 14, 0, 70);	//del later?
@@ -128,7 +128,7 @@ void readerv1() {
 			continue;
 		}
 		Qvector curQ;
-		centrality = ev->GetCentralityEstimator(5);
+		centrality = ev->GetCentrality(HADES_constants::kNhitsTOF_RPC_cut); //5
 		curQ.FindQ(ev);
 		if (curQ.GetComponent(1) == -999) {	//error check
 			histerr->Fill(1);
@@ -174,7 +174,7 @@ void readerv1() {
 		Qvector curQ;
 		Float_t res;
 		bool sub2good = false;
-		centrality = ev->GetCentralityEstimator(5);
+		centrality = ev->GetCentrality(HADES_constants::kNhitsTOF_RPC_cut);
 		while (!sub2good) {		//2rand
 			if (!curQ.Resolution(ev)) break;
 			Float_t Qxcor, Qycor;
@@ -249,7 +249,7 @@ void readerv1() {
 			continue;
 		}
 		Qvector curQ;
-		centrality = ev->GetCentralityEstimator(5);
+		centrality = ev->GetCentrality(HADES_constants::kNhitsTOF_RPC_cut);
 		curQ.FindQ(ev);
 		if (curQ.GetComponent(1) == -999) continue;
 		Float_t Qxcor = meanQx->GetBinContent((int)centrality / 5 + 1);
@@ -428,7 +428,7 @@ void readerv1() {
 	std::cerr << "v1 found" << std::endl;
 	
 	//save
-	TFile* w = new TFile("v1o.root", "recreate");
+	TFile* w = new TFile("v1b.root", "recreate");
 	w->cd();
 	meanQx->Write();
 	meanQy->Write();

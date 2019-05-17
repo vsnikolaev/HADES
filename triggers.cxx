@@ -87,7 +87,6 @@ bool Correct_FWhit(DataTreePSDModule* m_psd, bool work) {
 		return false;
 	if (m_psd->GetEnergy() > 600)				
 		return false;
-	/*	//Is it works?
 	if (m_psd->GetBeta() > 1.0)
 		return false;
 	Int_t x, y;
@@ -98,7 +97,7 @@ bool Correct_FWhit(DataTreePSDModule* m_psd, bool work) {
 			return false;
 	}
 	else if (abs(x) < 410 && abs(y) < 410) {	//next 2 rings (5-6) <400
-		if (m_psd->GetBeta() < 0.84)
+		if (m_psd->GetBeta() < 0.85)
 			return false;
 	}
 	else {										//next 3 rings (7-9)
@@ -109,7 +108,6 @@ bool Correct_FWhit(DataTreePSDModule* m_psd, bool work) {
 //	t = m_psd->GetTime();
 //	if (t < 10 || t>120) 
 //		return false;
-	*/
 	return true;
 }
 
@@ -215,13 +213,13 @@ bool Centrality_good_event(DataTreeEvent* _ev, bool work) {
 
 //I do not remember why it is here
 void read_header_file(std::vector<std::string> &_p) {
-	std::ifstream in("header_file.txt");
+	std::ifstream in("header_file.txt", ios::in);
 	if (!in) {
-		std::cout << "could not open file." << std::endl;
+		_p.clear();
 		return;
 	}
 	std::string s;
-	while (in) {
+	while (!in.eof()) {
 		std::getline(in, s);
 		_p.push_back(s);
 	}

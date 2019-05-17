@@ -4,6 +4,8 @@
 #ifndef MYTRIG
 #define MYTRIG
 #include "HADES_constants.h"
+#include <vector>
+#include <string>
 
 const float pi = 3.1415;
 const float _c = 299.792458;
