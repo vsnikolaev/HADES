@@ -112,8 +112,8 @@ bool Qvector::Resolution(DataTreeEvent* _ev) {
 		m_psd = _ev->GetPSDModule(i);
 		if (m_psd->GetId() < 0)
 			continue;
-	//	if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
-	//		continue;
+//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
+//			continue;
 		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;
 		my_psd_mod.push_back(m_psd);
@@ -320,12 +320,11 @@ Float_t Get_bessel_resolution(Float_t a) {
 		if (abs(resolution - a) < err)
 			break;
 	}
-	std::cerr << hi << std::endl;
+	//std::cerr << hi << std::endl;
 	if (hi >= 3) return Get_res2sub(a);
 	hi = hi*sqrt(2);
 	resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
 	//resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
-	//std::cerr << hi << std::endl;		//del later
 	resolution = sqrt(resolution);
 	return resolution;
 }	

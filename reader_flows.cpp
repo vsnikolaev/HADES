@@ -29,15 +29,15 @@ void reader_flows() {
 			Int_t minc, maxc;
 			minp = i*0.1;	maxp = i*0.1 + 0.1;
 			minc = j * 5;	maxc = j * 5 + 5;
-			v1PtCent2r[i][j] = new TProfile(Form("2r Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2r Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -1, 1);
-			v1PtCent1s[i][j] = new TProfile(Form("1s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("1s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -1, 1);
-			v1PtCent2s[i][j] = new TProfile(Form("2s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -1, 1);
-			v1PtCent3s[i][j] = new TProfile(Form("3s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("3s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -1, 1);
+			v1PtCent2r[i][j] = new TProfile(Form("2r Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2r Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -0.95, 1.05);
+			v1PtCent1s[i][j] = new TProfile(Form("1s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("1s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -0.95, 1.05);
+			v1PtCent2s[i][j] = new TProfile(Form("2s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -0.95, 1.05);
+			v1PtCent3s[i][j] = new TProfile(Form("3s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("3s Rap vs v1, Pt %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, -0.95, 1.05);
 			minp -= 0.95;		maxp -= 0.95;
-			v1RapCent2r[i][j] = new TProfile(Form("2r Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2r Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
-			v1RapCent1s[i][j] = new TProfile(Form("1s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("1s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
-			v1RapCent2s[i][j] = new TProfile(Form("2s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("2s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
-			v1RapCent3s[i][j] = new TProfile(Form("3s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), Form("3s Pt vs v1, Rap %1.1f - %1.1f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
+			v1RapCent2r[i][j] = new TProfile(Form("2r Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), Form("2r Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
+			v1RapCent1s[i][j] = new TProfile(Form("1s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), Form("1s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
+			v1RapCent2s[i][j] = new TProfile(Form("2s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), Form("2s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
+			v1RapCent3s[i][j] = new TProfile(Form("3s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), Form("3s Pt vs v1, Rap %1.2f - %1.2f , Cent %i - %i", minp, maxp, minc, maxc), 20, 0, 2);
 		}
 	}
 
@@ -129,7 +129,7 @@ NextFile:
 			momentum = tr->GetMomentum();
 			momentum.Boost(b);
 			Float_t pt = sqrt(tr->GetPx() * tr->GetPx() + tr->GetPy() * tr->GetPy());
-			if (pt > 2.0) continue;	//pt>2 -> do not fill hists
+			if (pt > 2.0) continue;	//pt>2 -> do not fill hists. same next 2 lines.
 			if (momentum.Rapidity() < -0.95) continue;
 			if (momentum.Rapidity() > 1.05) continue;
 			Float_t phi = tr->GetPhi();
@@ -182,6 +182,6 @@ SaveFile:
 	}
 	s->Close();
 	delete s;
-	std::cerr << "save done" << std::endl;
-	std::cerr << "program complete" << std::endl;
+	//std::cerr << "save done" << std::endl;
+	//std::cerr << "program complete" << std::endl;
 }

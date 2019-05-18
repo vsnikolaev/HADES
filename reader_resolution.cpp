@@ -150,7 +150,8 @@ NextFile:
 		cos12->Fill(centrality, cos3[2]);
 	}
 	for (int i = 0; i < 14; i++) {
-		Float_t cos3[3], cos3err[3], ent, res, err;	//3sub resolutions
+		Float_t cos3[3], cos3err[3], res, err;	//3sub resolutions
+		Int_t ent;
 		cos3[0] = cos10->GetBinContent(i + 1);
 		cos3[1] = cos20->GetBinContent(i + 1);
 		cos3[2] = cos12->GetBinContent(i + 1);
@@ -225,7 +226,7 @@ NextFile:
 	res3s2->Write();
 	res3s3->Write();
 	w->Close();
-	std::cerr << "File data successfully saved: " << save << std::endl;
+	//std::cerr << "File data successfully saved: " << save << std::endl;
 	delete w;
 
 	current_file_number++;
@@ -292,12 +293,6 @@ SaveFile:
 	r3s3sum->Write();
 	s->Close();
 	delete s;
-	std::cerr << "save done" << std::endl;
-	std::cerr << "program complete" << std::endl;
-	// temp begin
-	for (int i = 0; i < 14; i++) {
-		std::cerr << resum->GetBinContent(i + 1) << std::endl;
-		std::cerr << realresum->GetBinContent(i + 1) << std::endl;
-	}
-	//temp end
+	//std::cerr << "save done" << std::endl;
+	//std::cerr << "program complete" << std::endl;
 }
