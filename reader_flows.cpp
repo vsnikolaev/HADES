@@ -155,6 +155,26 @@ NextFile:
 	delete ev;
 	delete[] st;
 
+	TFile* w = new TFile(Form("f/Flov%d.root", current_file_number % 10 + 48), "recreate");	//if error occurred to save data...
+	for (int i = 0; i < 20; i++) {
+		for (int j = 0; j < 14; j++) {
+			v1PtCent2r[i][j]->Write();
+			v1PtCent1s[i][j]->Write();
+			v1PtCent2s[i][j]->Write();
+			v1PtCent3s[i][j]->Write();
+		}
+	}
+	for (int i = 0; i < 20; i++) {
+		for (int j = 0; j < 14; j++) {
+			v1RapCent2r[i][j]->Write();
+			v1RapCent1s[i][j]->Write();
+			v1RapCent2s[i][j]->Write();
+			v1RapCent3s[i][j]->Write();
+		}
+	}
+	w->Close();
+	delete w;
+
 	current_file_number++;
 	if (current_file_number == all_files.size()) goto SaveFile;	//went through the entire list
 	current_file = all_files.at(current_file_number);	//else...
