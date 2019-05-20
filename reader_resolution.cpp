@@ -31,20 +31,13 @@ void reader_resolution() {
 	TProfile* res3s3 = new TProfile("res3s3", "sub 3", 14, 0, 70);
 
 	TProfile* resolusum = new TProfile("cos2", "cos 2 rand", 14, 0, 70);
-	TProfile* realresum = new TProfile("res2ssum", "2 rand", 14, 0, 70);
-	TProfile* res3s1sum = new TProfile("res3s1sum", "sub 1", 14, 0, 70);
-	TProfile* res3s2sum = new TProfile("res3s2sum", "sub 2", 14, 0, 70);
-	TProfile* res3s3sum = new TProfile("res3s3sum", "sub 3", 14, 0, 70);
-
-	//temp begin
-	TProfile* resum = new TProfile("2 rand test res", "2 rand test res", 14, 0, 70);
-	TProfile* cos10s = new TProfile("s cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
-	TProfile* cos20s = new TProfile("s cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
-	TProfile* cos12s = new TProfile("s cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
-	TProfile* r3s1sum = new TProfile("r3s1sum", "sub 1 test", 14, 0, 70);
-	TProfile* r3s2sum = new TProfile("r3s2sum", "sub 2 test", 14, 0, 70);
-	TProfile* r3s3sum = new TProfile("r3s3sum", "sub 3 test", 14, 0, 70);
-	//temp end
+	TProfile* resum     = new TProfile("res2ssum", "2 rand", 14, 0, 70);
+	TProfile* cos10s    = new TProfile("s cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
+	TProfile* cos20s    = new TProfile("s cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
+	TProfile* cos12s    = new TProfile("s cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
+	TProfile* r3s1sum   = new TProfile("res3s1sum", "sub 1", 14, 0, 70);
+	TProfile* r3s2sum   = new TProfile("res3s2sum", "sub 2", 14, 0, 70);
+	TProfile* r3s3sum   = new TProfile("res3s3sum", "sub 3", 14, 0, 70);
 
 	TTree* t;
 	TBranch* DTEvent;
@@ -151,54 +144,43 @@ NextFile:
 	}
 	for (int i = 0; i < 14; i++) {
 		Float_t cos3[3], cos3err[3], res, err;	//3sub resolutions
-		Int_t ent;
 		cos3[0] = cos10->GetBinContent(i + 1);
 		cos3[1] = cos20->GetBinContent(i + 1);
 		cos3[2] = cos12->GetBinContent(i + 1);
 		cos3err[0] = cos10->GetBinError(i + 1);
 		cos3err[1] = cos20->GetBinError(i + 1);
 		cos3err[2] = cos12->GetBinError(i + 1);
-		ent = cos10->GetBinEntries(i + 1) / 2;
 		for (int j = 0; j < 3; j++) {	//take errors and enter them.
 			res = Get_resolution(cos3[0], cos3[1], cos3[2], j);
 			if (res != res) continue;
 			err = Get_error_resolution(cos3[0], cos3[1], cos3[2], cos3err[0], cos3err[1], cos3err[2], j);
-			err = sqrt(2 * ent)*err;
-			for (int k = 0; k < ent; k++) {
-				switch (j)
-				{
-				case 0:
-					res3s1->Fill(i * 5 + 2, res + err);
-					res3s1->Fill(i * 5 + 2, res - err);
-					break;
-				case 1:
-					res3s2->Fill(i * 5 + 2, res + err);
-					res3s2->Fill(i * 5 + 2, res - err);
-					break;
-				case 2:
-					res3s3->Fill(i * 5 + 2, res + err);
-					res3s3->Fill(i * 5 + 2, res - err);
-				default:
-					break;
-				}
+			err = sqrt(2)*err;
+			switch (j)
+			{
+			case 0:
+				res3s1->Fill(i * 5 + 2, res + err);
+				res3s1->Fill(i * 5 + 2, res - err);
+				break;
+			case 1:
+				res3s2->Fill(i * 5 + 2, res + err);
+				res3s2->Fill(i * 5 + 2, res - err);
+				break;
+			case 2:
+				res3s3->Fill(i * 5 + 2, res + err);
+				res3s3->Fill(i * 5 + 2, res - err);
+			default:
+				break;
 			}
 		}
 		res = resolu->GetBinContent(i + 1);		//2sub res
-		ent = resolu->GetBinEntries(i + 1) / 2;
 		err = Get_error_res2sub(res, resolu->GetBinError(i + 1));
-		err = sqrt(2 * ent)*err;
+		err = sqrt(2)*err;
 		res = Get_bessel_resolution(res);
 		if (res != res) continue;
-		for (int k = 0; k < ent; k++) {
-			realre->Fill(i * 5 + 2, res + err);
-			realre->Fill(i * 5 + 2, res - err);
-		}
+		realre->Fill(i * 5 + 2, res + err);
+		realre->Fill(i * 5 + 2, res - err);
 	}
 	resolusum->Add(resolu);
-	realresum->Add(realre);
-	res3s1sum->Add(res3s1);
-	res3s2sum->Add(res3s2);
-	res3s3sum->Add(res3s3);
 	cos10s->Add(cos10);
 	cos20s->Add(cos20);
 	cos12s->Add(cos12);
@@ -231,8 +213,8 @@ NextFile:
 
 	current_file_number++;
 	if (current_file_number == all_files.size()) goto SaveFile;	//went through the entire list
-	current_file = all_files.at(current_file_number);	//else...
-	if (current_file.size() < 5) goto SaveFile;					//usual stop. Last line is empty one.
+	current_file = all_files.at(current_file_number);			//else...
+	if (current_file.size() < 5) goto SaveFile;					//usual stop. Last line is empty one. or line st.
 	save[2] = current_file_number / 100 + 48;
 	save[3] = current_file_number / 10 + 48;
 	save[4] = current_file_number % 10 + 48;
@@ -283,11 +265,10 @@ SaveFile:
 	TFile* s = new TFile("resolutions.root", "recreate");
 	s->cd();
 	resolusum->Write();
-	realresum->Write();
-	res3s1sum->Write();
-	res3s2sum->Write();
-	res3s3sum->Write();
 	resum->Write();
+	cos10s->Write();
+	cos20s->Write();
+	cos12s->Write();
 	r3s1sum->Write();
 	r3s2sum->Write();
 	r3s3sum->Write();
