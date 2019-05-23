@@ -10,7 +10,6 @@ void reader_flows() {
 	std::string current_file;
 	current_file = all_files.at(current_file_number);
 
-	//Add
 	//init hists
 	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);	//recreate hist
 	TProfile* meanQy = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);	//recreate hist
@@ -125,7 +124,6 @@ NextFile:
 			if (!particle.DeterminedParticle(tr)) {
 				continue;
 			}
-			//2sub
 			momentum = tr->GetMomentum();
 			momentum.Boost(b);
 			Float_t pt = sqrt(tr->GetPx() * tr->GetPx() + tr->GetPy() * tr->GetPy());
@@ -135,7 +133,7 @@ NextFile:
 			Float_t phi = tr->GetPhi();
 			vn = cos(1 * (phi - PsiEP));
 			if (momentum.Rapidity() < 0) vn = -vn;
-			int binCent, binPt, binRap;	//start from 0. it is hist number.
+			int binCent, binPt, binRap;	//start from 0. it is hist numbers.
 			binCent = (int)centrality / 5;
 			binPt = (int)(pt * 10);
 			binRap = (int)((momentum.Rapidity() + 0.95) * 10);
@@ -155,7 +153,7 @@ NextFile:
 	delete ev;
 	delete[] st;
 
-	TFile* w = new TFile(Form("f/Flov%d.root", current_file_number % 10 + 48), "recreate");	//if error occurred to save data...
+	TFile* w = new TFile(Form("f/flov%d.root", current_file_number), "recreate");	//if error occurred to save data...
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 14; j++) {
 			v1PtCent2r[i][j]->Write();
@@ -177,8 +175,8 @@ NextFile:
 
 	current_file_number++;
 	if (current_file_number == all_files.size()) goto SaveFile;	//went through the entire list
-	current_file = all_files.at(current_file_number);	//else...
-	if (current_file.size() < 5) goto SaveFile;					//usual stop. Last line is empty one.
+	current_file = all_files.at(current_file_number);			//else...
+	if (current_file.size() < 5) goto SaveFile;					//usual stop. Last line is empty one. or line st.
 	goto NextFile;
 
 SaveFile:
@@ -202,6 +200,4 @@ SaveFile:
 	}
 	s->Close();
 	delete s;
-	//std::cerr << "save done" << std::endl;
-	//std::cerr << "program complete" << std::endl;
 }

@@ -48,9 +48,6 @@ void reader_resolution() {
 	Float_t centrality;
 	nTriggers particle;
 	particle.SetParticle(14);	//-2 off (all particles)
-	char save[10] = { 'r','/','0','0','0','.','r','o','o','t' };
-	char strange;
-	save[10] = ' ';	//else saved file names are strange.
 
 	//open file + clear histograms.
 NextFile:
@@ -190,7 +187,7 @@ NextFile:
 	delete ev;
 	delete[] st;
 
-	TFile* w = new TFile(save, "recreate");	//mb dell it?
+	TFile* w = new TFile(Form("r/res%d.root", current_file_number), "recreate");	//if error occurred to save data...
 	meanQx->Write();	//2sub
 	meanQy->Write();
 	resolu->Write();
@@ -208,20 +205,15 @@ NextFile:
 	res3s2->Write();
 	res3s3->Write();
 	w->Close();
-	//std::cerr << "File data successfully saved: " << save << std::endl;
 	delete w;
 
 	current_file_number++;
 	if (current_file_number == all_files.size()) goto SaveFile;	//went through the entire list
 	current_file = all_files.at(current_file_number);			//else...
 	if (current_file.size() < 5) goto SaveFile;					//usual stop. Last line is empty one. or line st.
-	save[2] = current_file_number / 100 + 48;
-	save[3] = current_file_number / 10 + 48;
-	save[4] = current_file_number % 10 + 48;
 	goto NextFile;
 
 SaveFile:
-	// temp begin
 	for (int i = 0; i < 14; i++) {
 		float res = resolusum->GetBinContent(i + 1);		//2sub res
 		float err = resolusum->GetBinError(i + 1);
@@ -260,7 +252,6 @@ SaveFile:
 			}
 		}
 	}
-	//temp end
 
 	TFile* s = new TFile("resolutions.root", "recreate");
 	s->cd();
@@ -274,6 +265,4 @@ SaveFile:
 	r3s3sum->Write();
 	s->Close();
 	delete s;
-	//std::cerr << "save done" << std::endl;
-	//std::cerr << "program complete" << std::endl;
 }
