@@ -20,11 +20,11 @@ Float_t Subevent3::Get_Psy(int a) {
 Float_t Subevent3::Get_Res(int a) {
 	switch (a) {
 	case 0: 
-		return sqrt((cos(1 * (Get_Psy(0) - Get_Psy(1))) * cos(1 * (Get_Psy(0) - Get_Psy(2)))) / cos(1 * (Get_Psy(1) - Get_Psy(2))));
+		return sqrt((cos(2 * (Get_Psy(0) - Get_Psy(1))) * cos(1 * (Get_Psy(0) - Get_Psy(2)))) / cos(2 * (Get_Psy(1) - Get_Psy(2))));
 	case 1:
-		return sqrt((cos(1 * (Get_Psy(1) - Get_Psy(2))) * cos(1 * (Get_Psy(1) - Get_Psy(0)))) / cos(1 * (Get_Psy(2) - Get_Psy(0))));
+		return sqrt((cos(2 * (Get_Psy(1) - Get_Psy(2))) * cos(1 * (Get_Psy(1) - Get_Psy(0)))) / cos(2 * (Get_Psy(2) - Get_Psy(0))));
 	case 2:
-		return sqrt((cos(1 * (Get_Psy(2) - Get_Psy(0))) * cos(1 * (Get_Psy(2) - Get_Psy(1)))) / cos(1 * (Get_Psy(0) - Get_Psy(1))));
+		return sqrt((cos(2 * (Get_Psy(2) - Get_Psy(0))) * cos(1 * (Get_Psy(2) - Get_Psy(1)))) / cos(2 * (Get_Psy(0) - Get_Psy(1))));
 	default:
 		return 0;
 	}
@@ -69,8 +69,6 @@ void Qvector::FindQ(DataTreeEvent* _ev) {
 		m_psd = _ev->GetPSDModule(i);
 		if ( m_psd->GetId()<0 )
 			continue;
-//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
-//			continue;
 		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;	
 		m_phi = m_psd->GetPhi();
@@ -112,8 +110,6 @@ bool Qvector::Resolution(DataTreeEvent* _ev) {
 		m_psd = _ev->GetPSDModule(i);
 		if (m_psd->GetId() < 0)
 			continue;
-//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
-//			continue;
 		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;
 		my_psd_mod.push_back(m_psd);
@@ -147,7 +143,7 @@ bool Qvector::Resolution(DataTreeEvent* _ev) {
 		Qysubev[0] += m_charge * sin(m_phi);
 		Q[0]	   += m_charge;
 	}
-	for (std::vector<DataTreePSDModule*>::iterator it = random_subevent2.begin(); it != random_subevent2.end(); it++) {	//хотел через итератор, но на it->GetEnergy() ругается.
+	for (std::vector<DataTreePSDModule*>::iterator it = random_subevent2.begin(); it != random_subevent2.end(); it++) {
 		m_psd	 = *it;
 		m_charge = m_psd->GetEnergy();
 		m_phi	 = m_psd->GetPhi();
@@ -170,7 +166,7 @@ void Qvector::RecenterRes(Float_t _corx1, Float_t _cory1, Float_t _corx2, Float_
 }
 
 Float_t Qvector::GetResolution(){
-	return cos(1 * (this->GetSubEPAngle(1) - this->GetSubEPAngle(2)));
+	return cos(2 * (this->GetSubEPAngle(1) - this->GetSubEPAngle(2)));
 }
 
 //a==1 a-b (auto); else b-a; function not used
@@ -204,8 +200,6 @@ bool Qvector::Fillsub3(DataTreeEvent* _ev) {
 		m_psd = _ev->GetPSDModule(i);
 		if (m_psd->GetId()<0)
 			continue;
-//		if (!_ev->GetPSDModule(i)->HasPassedCuts())	//Behruz
-//			continue;
 		if (!(Correct_FWhit(m_psd)))					//Oleg
 			continue;
 		m_phi = m_psd->GetPhi();
@@ -227,10 +221,7 @@ bool Qvector::Fillsub3(DataTreeEvent* _ev) {
 		count[idx]++;
 	}
 	for (int j = 0; j < 3; j++) {
-		if (Q[j] < 80) {
-			return false;
-		}				//empty sub event;
-		if (count[j] < 3) {
+		if (count[j] < 1) {
 			return false;
 		}
 		cur.Qx[j] = cur.Qx[j] / Q[j];
@@ -244,11 +235,11 @@ bool Qvector::Fillsub3(DataTreeEvent* _ev) {
 Float_t Qvector::Get_cos3(int a) {
 	switch (a)
 	{
-	case 0: return cos(1 * (Get_Psy3(0) - Get_Psy3(1)));
+	case 0: return cos(2 * (Get_Psy3(0) - Get_Psy3(1)));
 		break;
-	case 1: return cos(1 * (Get_Psy3(0) - Get_Psy3(2)));
+	case 1: return cos(2 * (Get_Psy3(0) - Get_Psy3(2)));
 		break;
-	case 2: return cos(1 * (Get_Psy3(1) - Get_Psy3(2)));
+	case 2: return cos(2 * (Get_Psy3(1) - Get_Psy3(2)));
 		break;
 	default:
 		break;
@@ -315,16 +306,16 @@ Float_t Get_bessel_resolution(Float_t a) {
 	Float_t resolution;
 	Float_t err = a / 100;
 	for (; hi < 3; hi += 0.0001) {
-		resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
-		//resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
+		//resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
+		resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
 		if (abs(resolution - a) < err)
 			break;
 	}
 	//std::cerr << hi << std::endl;
 	if (hi >= 3) return Get_res2sub(a);
 	hi = hi*sqrt(2);
-	resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
-	//resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
+	//resolution = 0.626657*hi - 0.09694*pow(hi, 3) + 0.02754*pow(hi, 4) - 0.002283*pow(hi, 5);		//k==1, v1
+	resolution = 0.25*pow(hi, 2) - 0.011414*pow(hi, 3) - 0.034726*pow(hi, 4) + 0.006815*pow(hi, 5);	//k==2, v2
 	resolution = sqrt(resolution);
 	return resolution;
 }	
