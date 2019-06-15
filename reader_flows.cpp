@@ -1,7 +1,7 @@
 #include "Qvector.h"
 #include "triggers.h"
 
-void reader_flows(TString init_string, int file_number) {
+void reader_flows(TString init_string, TString outFile) {
 
 	//init hists
 	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);		//recreate hist
@@ -180,7 +180,8 @@ void reader_flows(TString init_string, int file_number) {
 	delete f;
 	delete ev;
 
-	TFile* w = new TFile(Form("f/flov%d.root", file_number), "recreate");	//if error occurred to save data...
+	TFile* w = new TFile(outFile, "recreate");	//if error occurred to save data...
+	w->cd();
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 14; j++) {
 			v1PtCent2r[i][j]->Write();

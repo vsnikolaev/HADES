@@ -1,12 +1,10 @@
 #include "Qvector.h"
 #include "triggers.h"
 
-void reader_resolution(TString init_string, int file_number) {
+void reader_resolution(TString init_string, TString outFile) {
 
-	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);
-	TProfile* meanQy = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);
-	TProfile* resolu = new TProfile("mean cos", "cos from centrality", 14, 0, 70);
-
+	TProfile*  meanQx  = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);
+	TProfile*  meanQy  = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);
 	TProfile*  Qx3sub1 = new TProfile("Qx 3sub vs Centrality 1", "Qx sub1", 14, 0, 70);
 	TProfile*  Qx3sub2 = new TProfile("Qx 3sub vs Centrality 2", "Qx sub2", 14, 0, 70);
 	TProfile*  Qx3sub3 = new TProfile("Qx 3sub vs Centrality 3", "Qx sub3", 14, 0, 70);
@@ -14,19 +12,16 @@ void reader_resolution(TString init_string, int file_number) {
 	TProfile*  Qy3sub2 = new TProfile("Qy 3sub vs Centrality 2", "Qy sub2", 14, 0, 70);
 	TProfile*  Qy3sub3 = new TProfile("Qy 3sub vs Centrality 3", "Qy sub3", 14, 0, 70);
 
+	TProfile* resolu = new TProfile("mean cos", "cos from centrality", 14, 0, 70);
 	TProfile*  cos10 = new TProfile("cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
 	TProfile*  cos20 = new TProfile("cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
 	TProfile*  cos12 = new TProfile("cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
 
 	TTree* t;
 	TBranch* DTEvent;
-	DataTreeTrack* tr;
-	DataTreeTOFHit* tof_hit;
-	DataTreePSDModule* m_psd;
 	Int_t N_events;
 	Float_t centrality;
-	nTriggers particle;
-	particle.SetParticle(14);	//-2 off (all particles)
+	
 	TFile* f = new TFile(init_string);
 	t = (TTree*)f->Get("DataTree");
 	DataTreeEvent* ev = new DataTreeEvent;
@@ -99,7 +94,8 @@ void reader_resolution(TString init_string, int file_number) {
 	delete f;
 	delete ev;
 
-	TFile* w = new TFile(Form("r/r%d.root", file_number), "recreate");
+	TFile* w = new TFile(outFile, "recreate");
+	w->cd();
 	resolu->Write();	//2sub
 	cos10->Write();		//3sub
 	cos20->Write();
