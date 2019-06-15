@@ -13,6 +13,6 @@ source $hadesroot
 
 echo executing $root -l "rootlogon.c" "reader_resolution.cpp($file)"
 
-$root -l "rootlogon.c" "reader_resolution.cpp($file, $job_num)" 
+$root -l "rootlogon.c" "reader_resolution.cpp($file, $out_file)" 
 echo JOB FINISHED!
 date $format
