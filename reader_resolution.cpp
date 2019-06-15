@@ -98,7 +98,7 @@ void reader_resolution(TString init_string, int file_number) {
 	f->Close();
 	delete f;
 	delete ev;
-	delete[] st;
+
 	TFile* w = new TFile(Form("r/r%d.root", file_number), "recreate");
 	resolu->Write();	//2sub
 	cos10->Write();		//3sub

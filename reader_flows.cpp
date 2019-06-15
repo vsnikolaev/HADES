@@ -64,7 +64,7 @@ void reader_flows(TString init_string, int file_number) {
 		res3[2][i] = histresolution33->GetBinContent(i + 1);
 	}
 	f2->Close();
-	TFile* f = new TFile(st);
+	TFile* f = new TFile(init_string);
 	t = (TTree*)f->Get("DataTree");
 	DataTreeEvent* ev = new DataTreeEvent;
 	DTEvent = (TBranch*)t->GetBranch("DTEvent");
@@ -179,7 +179,6 @@ void reader_flows(TString init_string, int file_number) {
 	f->Close();
 	delete f;
 	delete ev;
-	delete[] st;
 
 	TFile* w = new TFile(Form("f/flov%d.root", file_number), "recreate");	//if error occurred to save data...
 	for (int i = 0; i < 20; i++) {
