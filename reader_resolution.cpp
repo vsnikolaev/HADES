@@ -1,14 +1,7 @@
 #include "Qvector.h"
 #include "triggers.h"
 
-void reader_resolution() {
-
-	int current_file_number = 0;
-	std::vector<std::string> all_files;
-	read_header_file(all_files);
-	if (all_files.size() == 0) return;
-	std::string current_file;
-	current_file = all_files.at(current_file_number);
+TString reader_resolution(TString init_string) {
 
 	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);
 	TProfile* meanQy = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);
@@ -25,15 +18,6 @@ void reader_resolution() {
 	TProfile*  cos20 = new TProfile("cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
 	TProfile*  cos12 = new TProfile("cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
 
-	TProfile* resolusum = new TProfile("cos2", "cos 2 rand", 14, 0, 70);
-	TProfile* resum     = new TProfile("res2ssum", "2 rand", 14, 0, 70);
-	TProfile* cos10s    = new TProfile("s cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
-	TProfile* cos20s    = new TProfile("s cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
-	TProfile* cos12s    = new TProfile("s cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
-	TProfile* r3s1sum   = new TProfile("res3s1sum", "sub 1", 14, 0, 70);
-	TProfile* r3s2sum   = new TProfile("res3s2sum", "sub 2", 14, 0, 70);
-	TProfile* r3s3sum   = new TProfile("res3s3sum", "sub 3", 14, 0, 70);
-
 	TTree* t;
 	TBranch* DTEvent;
 	DataTreeTrack* tr;
@@ -45,7 +29,6 @@ void reader_resolution() {
 	particle.SetParticle(14);	//-2 off (all particles)
 
 	//open file + clear histograms.
-	while (true) {
 		char *st = new char[current_file.size()];	//WHERE is support of new lines,
 		for (int i = 0; i + 1 < current_file.size(); i++) {
 			st[i] = current_file.at(i);
@@ -55,20 +38,6 @@ void reader_resolution() {
 		DataTreeEvent* ev = new DataTreeEvent;
 		DTEvent = (TBranch*)t->GetBranch("DTEvent");
 		DTEvent->SetAddress(&ev);
-		meanQx->Reset();
-		meanQy->Reset();
-		resolu->Reset();
-		Qx3sub1->Reset();
-		Qx3sub2->Reset();
-		Qx3sub3->Reset();
-		Qy3sub1->Reset();
-		Qy3sub2->Reset();
-		Qy3sub3->Reset();
-		cos10->Reset();
-		cos20->Reset();
-		cos12->Reset();
-		//std::cerr << "Running file: " << current_file << std::endl;
-
 		N_events = t->GetEntries();
 		//find mean 2 rand subevent + 3 sub
 		for (Int_t i = 0; i < N_events; i++) {
@@ -94,8 +63,6 @@ void reader_resolution() {
 			Qx3sub3->Fill(centrality, cursub3.Qx[2]);
 			Qy3sub3->Fill(centrality, cursub3.Qy[2]);
 		}
-		//std::cerr << "mean found" << std::endl;
-
 		//recent + resolution
 		for (Int_t i = 0; i < N_events; i++) {
 			DTEvent->GetEntry(i);
@@ -134,79 +101,23 @@ void reader_resolution() {
 			cos20->Fill(centrality, cos3[1]);
 			cos12->Fill(centrality, cos3[2]);
 		}
-		resolusum->Add(resolu);
-		cos10s->Add(cos10);
-		cos20s->Add(cos20);
-		cos12s->Add(cos12);
-		//std::cerr << "resolution found" << std::endl;
 		f->Close();
 		delete f;
 		delete ev;
 		delete[] st;
-
-		TFile* w = new TFile(Form("r/res%d.root", current_file_number), "recreate");	//if error occurred to save data...
+		TSting outhist;
+		outstring.SetSize(init_string.GetShortSize());
+		outhist[0] = 'r';
+		outhist[1] = '/';
+		outhist[2] = 'o';
+		for (int i = 0; i < init_string.GetShortSize(); i++)
+			outhish[i + 3] = inithist[i];
+		TFile* w = new TFile(outhist, "recreate");
 		resolu->Write();	//2sub
 		cos10->Write();		//3sub
 		cos20->Write();
 		cos12->Write();
 		w->Close();
 		delete w;
-
-		current_file_number++;
-		if (current_file_number == all_files.size()) break;	//went through the entire list
-		current_file = all_files.at(current_file_number);			//else...
-		if (current_file.size() < 5) break;					//usual stop. Last line is empty one. or line st.
-	}
-	//Save file
-	for (int i = 0; i < 14; i++) {
-		float res = resolusum->GetBinContent(i + 1);		//2sub res
-		float err = resolusum->GetBinError(i + 1);
-		err = Get_error_res2sub(res, err);
-		res = Get_bessel_resolution(res);
-		if (res != res) continue;
-		resum->Fill(i * 5 + 2, res + sqrt(2)*err);
-		resum->Fill(i * 5 + 2, res - sqrt(2)*err);	
-		float cos3[3], cos3err[3];							//3sub res
-		cos3[0] = cos10s->GetBinContent(i + 1);
-		cos3[1] = cos20s->GetBinContent(i + 1);
-		cos3[2] = cos12s->GetBinContent(i + 1);
-		cos3err[0] = cos10s->GetBinError(i + 1);
-		cos3err[1] = cos20s->GetBinError(i + 1);
-		cos3err[2] = cos12s->GetBinError(i + 1);
-		for (int j = 0; j < 3; j++) {
-			res = Get_resolution(cos3[0], cos3[1], cos3[2], j);
-			if (res != res) continue;
-			err = Get_error_resolution(cos3[0], cos3[1], cos3[2], cos3err[0], cos3err[1], cos3err[2], j);
-			err = sqrt(2)*err;
-			switch (j)
-			{
-			case 0:
-				r3s1sum->Fill(i * 5 + 2, res + err);
-				r3s1sum->Fill(i * 5 + 2, res - err);
-				break;
-			case 1:
-				r3s2sum->Fill(i * 5 + 2, res + err);
-				r3s2sum->Fill(i * 5 + 2, res - err);
-				break;
-			case 2:
-				r3s3sum->Fill(i * 5 + 2, res + err);
-				r3s3sum->Fill(i * 5 + 2, res - err);
-			default:
-				break;
-			}
-		}
-	}
-
-	TFile* s = new TFile("resolutions.root", "recreate");
-	s->cd();
-	resolusum->Write();
-	resum->Write();
-	cos10s->Write();
-	cos20s->Write();
-	cos12s->Write();
-	r3s1sum->Write();
-	r3s2sum->Write();
-	r3s3sum->Write();
-	s->Close();
-	delete s;
+		return outhist;
 }
