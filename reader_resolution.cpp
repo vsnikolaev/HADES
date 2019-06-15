@@ -1,7 +1,7 @@
 #include "Qvector.h"
 #include "triggers.h"
 
-TString reader_resolution(TString init_string) {
+void reader_resolution(TString init_string, int file_number) {
 
 	TProfile* meanQx = new TProfile("MeanQx vs Centrality", "centrality mean Qx", 14, 0, 70);
 	TProfile* meanQy = new TProfile("MeanQy vs Centrality", "centrality mean Qy", 14, 0, 70);
@@ -99,19 +99,11 @@ TString reader_resolution(TString init_string) {
 	delete f;
 	delete ev;
 	delete[] st;
-	TSting outhist;
-	outstring.SetSize(init_string.GetShortSize());
-	outhist[0] = 'r';
-	outhist[1] = '/';
-	outhist[2] = 'o';
-	for (int i = 0; i < init_string.GetShortSize(); i++)
-		outhish[i + 3] = inithist[i];
-	TFile* w = new TFile(outhist, "recreate");
+	TFile* w = new TFile(Form("r/r%d.root", file_number), "recreate");
 	resolu->Write();	//2sub
 	cos10->Write();		//3sub
 	cos20->Write();
 	cos12->Write();
 	w->Close();
 	delete w;
-	return outhist;
 }
