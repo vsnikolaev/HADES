@@ -42,8 +42,6 @@ void reader_flows(TString init_string, TString outFile) {
 	TTree* t;
 	TBranch* DTEvent;
 	DataTreeTrack* tr;
-	DataTreeTOFHit* tof_hit;
-	DataTreePSDModule* m_psd;
 	Int_t N_events;
 	Float_t centrality;
 	nTriggers particle;
@@ -180,7 +178,7 @@ void reader_flows(TString init_string, TString outFile) {
 	delete f;
 	delete ev;
 
-	TFile* w = new TFile(outFile, "recreate");	//if error occurred to save data...
+	TFile* w = new TFile("r/"+outFile+".root", "recreate");	//if error occurred to save data...
 	w->cd();
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 14; j++) {
