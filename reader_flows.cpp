@@ -150,26 +150,26 @@ void reader_flows(TString init_string, TString outFile) {
 			vn = cos(2 * (phi - PsiEP)) / res2[binCent];
 			if (vn != vn) continue;
 			v1PtCent2r[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			if (momentum.Rapidity() < 0) vn = -vn;
+			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent2r[binRap][binCent]->Fill(pt, vn);
 
 			if (!good3subeve) continue;
 			vn = cos(2 * (phi - PsiEP3[0])) / res3[0][binCent];
 			if (vn != vn) continue;
 			v1PtCent1s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			if (momentum.Rapidity() < 0) vn = -vn;
+			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent1s[binRap][binCent]->Fill(pt, vn);
 
 			vn = cos(2 * (phi - PsiEP3[1])) / res3[1][binCent];
 			if (vn != vn) continue;
 			v1PtCent2s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			if (momentum.Rapidity() < 0) vn = -vn;
+			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent2s[binRap][binCent]->Fill(pt, vn);
 
 			vn = cos(2 * (phi - PsiEP3[2])) / res3[2][binCent];
 			if (vn != vn) continue;
 			v1PtCent3s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			if (momentum.Rapidity() < 0) vn = -vn;
+			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent3s[binRap][binCent]->Fill(pt, vn);
 		}
 	}
