@@ -178,7 +178,7 @@ void reader_flows(TString init_string, TString outFile) {
 	delete f;
 	delete ev;
 
-	TFile* w = new TFile("r/"+outFile+".root", "recreate");	//if error occurred to save data...
+	TFile* w = new TFile("f/"+outFile+".root", "recreate");
 	w->cd();
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 14; j++) {
