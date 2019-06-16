@@ -11,8 +11,13 @@ file="$input_file"
 echo "loading " $hadesroot
 source $hadesroot
 
-echo executing $root -l "rootlogon.c" "reader_resolution.cpp($file)"
+#echo executing $root -l ""reader_resolution.cpp""(""$file"")""
 
-$root -l "rootlogon.c" "reader_resolution.cpp($file, $out_file)" 
+if [ $curent_mod -eq 2 ]
+then
+root -l -b "reader_flows.cpp(\"$input_file\",\"$output_file\")" 
+else
+root -l -b "reader_resolution.cpp(\"$input_file\",\"$output_file\")" 
+fi
 echo JOB FINISHED!
 date $format
