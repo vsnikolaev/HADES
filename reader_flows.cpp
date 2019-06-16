@@ -50,7 +50,7 @@ void reader_flows(TString init_string, TString outFile) {
 	Float_t res2[14], res3[3][14];
 
 	//take resolutions,
-	TFile *f2 = new TFile("r/resolutions.root", "READ");
+	TFile *f2 = new TFile("resolutions.root", "READ");
 	TProfile* histresolution2 = (TProfile*)f2->Get("res2ssum;1");
 	TProfile* histresolution31 = (TProfile*)f2->Get("res3s1sum;1");
 	TProfile* histresolution32 = (TProfile*)f2->Get("res3s2sum;1");
