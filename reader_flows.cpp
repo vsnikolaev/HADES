@@ -105,11 +105,13 @@ void reader_flows(TString init_string, TString outFile) {
 		int binCent;
 		binCent = (int)centrality / 5;
 		if (centrality > 70) continue;
-		curQ.FindQ(ev);
-		if (curQ.GetComponent(1) == -999) continue;
+//		curQ.FindQ(ev);
+//		if (curQ.GetComponent(1) == -999) continue;
+		if (!curQ.Resolution(ev)) break;	//test
 		Float_t Qxcor = meanQx->GetBinContent(binCent + 1);
 		Float_t Qycor = meanQy->GetBinContent(binCent + 1);
-		curQ.Recenter(Qxcor, Qycor);
+		curQ.RecenterRes(Qxcor, Qycor, Qxcor, Qycor);	//test
+//		curQ.Recenter(Qxcor, Qycor);
 		if (!curQ.Fillsub3(ev)) good3subeve = false;		//3sub
 		Subevent3 meansub3;
 		meansub3.Qx[0] = mean31Qx->GetBinContent(binCent + 1);
@@ -119,7 +121,7 @@ void reader_flows(TString init_string, TString outFile) {
 		meansub3.Qx[2] = mean33Qx->GetBinContent(binCent + 1);
 		meansub3.Qy[2] = mean33Qy->GetBinContent(binCent + 1);
 		curQ.Resentsub3(meansub3);
-		Float_t PsiEP = curQ.GetEventPlaneAngle();
+		Float_t PsiEP = GetSubEPAngle(1);
 		Float_t PsiEP3[3];
 		for (int j = 0; j < 3; j++)
 			PsiEP3[j] = curQ.Get_Psy3(j);
