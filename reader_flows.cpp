@@ -45,7 +45,7 @@ void reader_flows(TString init_string, TString outFile) {
 	Int_t N_events;
 	Float_t centrality;
 	nTriggers particle;
-	particle.SetParticle(14);	//-2 off (all particles)
+	particle.SetParticle(8);	//-2 off (all particles) //pi+ 8, pi- 9, p 14
 
 	Float_t res2[14], res3[3][14];
 
@@ -105,13 +105,11 @@ void reader_flows(TString init_string, TString outFile) {
 		int binCent;
 		binCent = (int)centrality / 5;
 		if (centrality > 70) continue;
-//		curQ.FindQ(ev);
-//		if (curQ.GetComponent(1) == -999) continue;
-		if (!curQ.Resolution(ev)) break;	//test
+		curQ.FindQ(ev);
+		if (curQ.GetComponent(1) == -999) continue;
 		Float_t Qxcor = meanQx->GetBinContent(binCent + 1);
 		Float_t Qycor = meanQy->GetBinContent(binCent + 1);
-		curQ.RecenterRes(Qxcor, Qycor, Qxcor, Qycor);	//test
-//		curQ.Recenter(Qxcor, Qycor);
+		curQ.Recenter(Qxcor, Qycor);
 		if (!curQ.Fillsub3(ev)) good3subeve = false;		//3sub
 		Subevent3 meansub3;
 		meansub3.Qx[0] = mean31Qx->GetBinContent(binCent + 1);
@@ -121,7 +119,7 @@ void reader_flows(TString init_string, TString outFile) {
 		meansub3.Qx[2] = mean33Qx->GetBinContent(binCent + 1);
 		meansub3.Qy[2] = mean33Qy->GetBinContent(binCent + 1);
 		curQ.Resentsub3(meansub3);
-		Float_t PsiEP = GetSubEPAngle(1);
+		Float_t PsiEP = curQ.GetEventPlaneAngle();
 		Float_t PsiEP3[3];
 		for (int j = 0; j < 3; j++)
 			PsiEP3[j] = curQ.Get_Psy3(j);
@@ -152,26 +150,22 @@ void reader_flows(TString init_string, TString outFile) {
 			vn = cos(2 * (phi - PsiEP)) / res2[binCent];
 			if (vn != vn) continue;
 			v1PtCent2r[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent2r[binRap][binCent]->Fill(pt, vn);
 
 			if (!good3subeve) continue;
 			vn = cos(2 * (phi - PsiEP3[0])) / res3[0][binCent];
 			if (vn != vn) continue;
 			v1PtCent1s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent1s[binRap][binCent]->Fill(pt, vn);
 
 			vn = cos(2 * (phi - PsiEP3[1])) / res3[1][binCent];
 			if (vn != vn) continue;
 			v1PtCent2s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent2s[binRap][binCent]->Fill(pt, vn);
 
 			vn = cos(2 * (phi - PsiEP3[2])) / res3[2][binCent];
 			if (vn != vn) continue;
 			v1PtCent3s[binPt][binCent]->Fill(momentum.Rapidity(), vn);
-			//if (momentum.Rapidity() < 0) vn = -vn;
 			v1RapCent3s[binRap][binCent]->Fill(pt, vn);
 		}
 	}
