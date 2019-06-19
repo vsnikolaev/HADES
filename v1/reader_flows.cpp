@@ -45,7 +45,7 @@ void reader_flows(TString init_string, TString outFile) {
 	Int_t N_events;
 	Float_t centrality;
 	nTriggers particle;
-	particle.SetParticle(8);	//-2 off (all particles) //pi+ 8, pi- 9, p 14
+	particle.SetParticle(14);	//-2 off (all particles) //pi+ 8, pi- 9, p 14
 
 	Float_t res2[14], res3[3][14];
 

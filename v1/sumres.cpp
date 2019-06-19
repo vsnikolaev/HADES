@@ -20,22 +20,13 @@ Float_t Get_error_res2sub(Float_t a, Float_t a_er) {
 
 void sumres() {
 	//to make list of files write: find $PWD -type f | cat > list_of_files.txt
-	int current_file_number = 0;
-	std::vector<std::string> all_files;
-	read_header_file(all_files);
-	if (all_files.size() == 0) return;
-	std::string current_file;
-	current_file = all_files.at(current_file_number);
 
 	TProfile* resolusum = new TProfile("cos2", "cos 2 rand", 14, 0, 70);		//temp hists.
 	TProfile* cos10s = new TProfile("s cos10 vs Centrality 3 sub", "cos21", 14, 0, 70);
 	TProfile* cos20s = new TProfile("s cos20 vs Centrality 3 sub", "cos31", 14, 0, 70);
 	TProfile* cos12s = new TProfile("s cos12 vs Centrality 3 sub", "cos32", 14, 0, 70);
 
-	//open file + clear histograms.
-	while (true) {
-		TString stv2 = current_file;
-		TFile* f = new TFile(stv2);
+		TFile* f = new TFile("r/100.root");
 		TProfile* resolu = (TProfile*)f->Get("mean cos;1");
 		TProfile* cos10 = (TProfile*)f->Get("cos10 vs Centrality 3 sub;1");
 		TProfile* cos20 = (TProfile*)f->Get("cos20 vs Centrality 3 sub;1");
@@ -48,11 +39,6 @@ void sumres() {
 		f->Close();
 		delete f;
 
-		current_file_number++;
-		if (current_file_number == all_files.size()) break;	//went through the entire list
-		current_file = all_files.at(current_file_number);			//else...
-		if (current_file.size() < 5) break;					//usual stop. Last line is empty one. or line st.
-	}
 	TProfile* resum = new TProfile("res2ssum", "2 rand", 14, 0, 70);			//final hists
 	TProfile* r3s1sum = new TProfile("res3s1sum", "sub 1", 14, 0, 70);
 	TProfile* r3s2sum = new TProfile("res3s2sum", "sub 2", 14, 0, 70);
@@ -108,21 +94,6 @@ void sumres() {
 	r3s3sum->Write();
 	s->Close();
 	delete s;
-}
-
-
-void read_header_file(std::vector<std::string> &_p) {
-	std::ifstream in("list_of_files.txt", ios::in);
-	if (!in) {
-		_p.clear();
-		return;
-	}
-	std::string s;
-	while (!in.eof()) {
-		std::getline(in, s);
-		_p.push_back(s);
-	}
-	in.close();
 }
 
 
